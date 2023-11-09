@@ -23,6 +23,8 @@ year = match.group(1)
 month = match.group(2)
 # sqlite3 treats dates as midnights of those dates
 first_day = f"{year}-{month}-01"
+if month == '12':
+    month = '00'
 last_day = f"{year}-{str(int(month)+1).zfill(2)}-01"
 print(first_day)
 print(last_day)
