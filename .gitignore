@@ -1,3 +1,6 @@
 __pycache__/
-data/
-fairy/streaming.db
+data/**
+reports/**
+my_spotify_data*.zip
+my_spotify_data.zip
+streaming.db

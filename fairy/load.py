@@ -1,7 +1,7 @@
 # Put functions to import here
 # open an endsong_json file & read data
 # put in sqlite db if not already stored there
-import sqlite3, json
+import sqlite3, json, os
 
 #def function to CREATE TABLE
 def create_table_streams(dbhandle):
@@ -65,3 +65,11 @@ def load_spotify_json_data(filehandle, dbhandle):
         # attempt to add to database
     connection.close()
     
+def parse_json_data(directory, dbhandle):
+    print("Parsing raw JSON data from Spotify...")
+    current_directory = os.getcwd()
+    all_files = os.listdir(current_directory)
+    files_to_check = [file for file in all_files if file.startswith('Streaming_History_Audio_') and file.endswith('.json')]
+    for filehandle in files_to_check:
+        print(f"    Parsing {filehandle}...")
+        load_spotify_json_data(filehandle, dbhandle)

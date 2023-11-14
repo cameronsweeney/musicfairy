@@ -1,31 +1,37 @@
 import argparse, sys, datetime
 
+from fairy.load import create_table_streams, drop_table_streams, load_spotify_json_data, parse_json_data
+from fairy.report import test_report
+
 def main():
     # Create ArgumentParser object
     parser = argparse.ArgumentParser(description='Spotify music fairy')
 
-    # Add positional argument
-    parser.add_argument('--report', help='Generate daily report', nargs=1)
+    # Add main arguments, mutually exclusive
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-i', '--initialize', action='store_true', help='Initialize database from data/')
+    group.add_argument('-r', '--report', help='Generate daily report')
 
-    # Add optional arguments
-    #parser.add_argument('--output', '-o', help='Path to the output file')
-    #parser.add_argument('--output', '-o', help='Path to the output file')
-    #parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose mode')
 
     # Parse the command-line arguments
     args = parser.parse_args()
 
-    # Access the values using the attribute notation
-    report_type = args.report
-    report_day = ''
+    if args.initialize:
+        dbhandle = "./data/streaming.db"
+        #drop_table_streams(dbhandle)
+        create_table_streams(dbhandle)
+        parse_json_data("./data/", dbhandle)
+        print(test_report(dbhandle))
+    elif args.report:
+        # Access the values using the attribute notation
+        report_type = args.report
+        report_day = ''
+        try:
+            report_day = datetime.datetime.strptime(report_type[0], "%Y-%m-%d").date()
+            print(f'Report arg: {report_day.strftime("%a %b %d %Y")}')
+        except ValueError:
+            print("Sorry, for reports, I'm just accepting days in %Y-%m-%d format right now.")
 
-    try:
-        report_day = datetime.datetime.strptime(report_type[0], "%Y-%m-%d").date()
-    except ValueError:
-        print("Sorry, just accepting days in %Y-%m-%d format right now.")
-
-    # Your program logic goes here
-    print(f'Report arg: {report_day.strftime("%a %b %d %Y")}')
 
 if __name__ == '__main__':
     main()
