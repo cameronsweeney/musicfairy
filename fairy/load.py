@@ -68,8 +68,9 @@ def load_spotify_json_data(filehandle, dbhandle):
 def parse_json_data(directory, dbhandle):
     print("Parsing raw JSON data from Spotify...")
     current_directory = os.getcwd()
-    all_files = os.listdir(current_directory)
+    all_files = os.listdir(directory)
     files_to_check = [file for file in all_files if file.startswith('Streaming_History_Audio_') and file.endswith('.json')]
+    print(all_files)
     for filehandle in files_to_check:
         print(f"    Parsing {filehandle}...")
-        load_spotify_json_data(filehandle, dbhandle)
+        load_spotify_json_data(directory+filehandle, dbhandle)

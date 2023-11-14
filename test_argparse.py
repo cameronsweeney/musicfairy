@@ -18,10 +18,9 @@ def main():
 
     if args.initialize:
         dbhandle = "./data/streaming.db"
-        #drop_table_streams(dbhandle)
+        drop_table_streams(dbhandle)
         create_table_streams(dbhandle)
         parse_json_data("./data/", dbhandle)
-        print(test_report(dbhandle))
     elif args.report:
         # Access the values using the attribute notation
         report_type = args.report

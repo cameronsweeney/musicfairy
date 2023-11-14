@@ -1,7 +1,7 @@
-import sys, re, sqlite3, pprint
+import sys, re, sqlite3, os
 from fairy.report import report_artist
 
-dbhandle = './fairy/streaming.db'
+dbhandle = './data/streaming.db'
 
 # called with 0 or 1 arguments
 if len(sys.argv) <= 2:
@@ -42,6 +42,7 @@ cursor = connection.cursor()
 result = cursor.execute(sql, (first_day, last_day))
 output = result.fetchall()
 #print(output)
+os.makedirs('./reports', exist_ok=True)
 with open(f"./reports/{sys.argv[2]}.txt", "w+", encoding='utf8') as file:
     for line in output:
         file.write(str(line))
