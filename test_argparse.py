@@ -55,6 +55,7 @@ def report_month(dbhandle, year_month):
     first_day = f"{year}-{month}-01"
     if month == '12':
         month = '00'
+        year = str(int(year) + 1).zfill(2)
     last_day = f"{year}-{str(int(month)+1).zfill(2)}-01"
     print(year)
     print(month)
