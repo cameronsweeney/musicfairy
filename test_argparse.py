@@ -77,10 +77,38 @@ def report_month(dbhandle, year_month):
             file.write('\n')
     connection.close()
 
+def report_day(dbhandle, year_month_day):
+    try:
+        date_object = datetime.datetime.strptime(year_month_day, '%Y-%m-%d')
+    except ValueError:
+        print("Please format your days in the form YYYY-MM-DD.")
+
+    next_day = date_object + datetime.timedelta(days=1)
+    next_day_string = next_day.strftime('%Y-%m-%d')
+
+    sql = """
+        SELECT artist_name, track_name, spotify_track_uri, COUNT(*) as frequency
+        FROM streams
+        WHERE ts BETWEEN ? AND ?
+        GROUP BY artist_name, track_name
+        ORDER BY COUNT(*) DESC;
+    """
+    connection = sqlite3.connect(dbhandle)
+    cursor = connection.cursor()
+    result = cursor.execute(sql, (year_month_day, next_day_string))
+    output = result.fetchall()
+    with open(f"./reports/day/{year_month_day}.txt", "w+", encoding='utf8') as file:
+        for line in output:
+            file.write(str(line))
+            file.write('\n')
+    connection.close()
+
+
 report_switch_dict = {
     'artist': report_artist,
     'song': report_song,
-    'month': report_month
+    'month': report_month,
+    'day': report_day
 }
 
 def main():
@@ -119,13 +147,6 @@ def main():
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
-
-#        report_day = ''
-#        try:
-#            report_day = datetime.datetime.strptime(report_type[0], "%Y-%m-%d").date()
-#            print(f'Report arg: {report_day.strftime("%a %b %d %Y")}')
-#        except ValueError:
-#            print("Sorry, for reports, I'm just accepting days in %Y-%m-%d format right now.")
 
 if __name__ == '__main__':
     main()
