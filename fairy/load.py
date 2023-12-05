@@ -74,3 +74,10 @@ def parse_json_data(directory, dbhandle):
     for filehandle in files_to_check:
         print(f"    Parsing {filehandle}...")
         load_spotify_json_data(directory+filehandle, dbhandle)
+
+
+def initialize_database(dbhandle, data_source_directory):
+    pass
+    drop_table_streams(dbhandle)
+    create_table_streams(dbhandle)
+    parse_json_data(data_source_directory, dbhandle)
