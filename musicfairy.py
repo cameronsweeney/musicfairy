@@ -106,12 +106,58 @@ def report_day(dbhandle, year_month_day):
             file.write('\n')
     connection.close()
 
+def report_top_songs_all_time(dbhandle):
+    sql = """
+        SELECT artist_name, track_name, spotify_track_uri, COUNT(*) as frequency
+        FROM streams
+        GROUP BY artist_name, track_name
+        ORDER BY COUNT(*) DESC;
+    """
+    connection = sqlite3.connect(dbhandle)
+    cursor = connection.cursor()
+    result = cursor.execute(sql)
+    output = result.fetchall()
+    os.makedirs('./reports/', exist_ok=True)
+    with open(f"./reports/top_songs.txt", "w+", encoding='utf8') as file:
+        for line in output:
+            file.write(str(line))
+            file.write('\n')
+    connection.close()
+
+def report_weekday(dbhandle, weekday):
+    try:
+        date_object = datetime.datetime.strptime(weekday, '%A')
+    except ValueError:
+        print("Please format your weekdays with a capital letter and full spelling.")
+        exit()
+
+    day_of_week_number = date_object.weekday()
+
+    sql = """
+        SELECT artist_name, track_name, spotify_track_uri, COUNT(*) as frequency
+        FROM streams
+        WHERE strftime('%w', ts) = ?
+        GROUP BY artist_name, track_name
+        ORDER BY COUNT(*) DESC;
+    """
+    connection = sqlite3.connect(dbhandle)
+    cursor = connection.cursor()
+    result = cursor.execute(sql, (day_of_week_number,))
+    output = result.fetchall()
+    os.makedirs('./reports/weekday/', exist_ok=True)
+    with open(f"./reports/weekday/{weekday}.txt", "w+", encoding='utf8') as file:
+        for line in output:
+            file.write(str(line))
+            file.write('\n')
+    connection.close()
 
 report_switch_dict = {
     'artist': report_artist,
     'song': report_song,
+    'top_songs': report_top_songs_all_time,
     'month': report_month,
-    'day': report_day
+    'day': report_day,
+    'weekday': report_weekday
 }
 
 
@@ -148,6 +194,7 @@ def main():
             report_function(dbhandle, *report_args)
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
+            print(report_args)
 
 
 if __name__ == '__main__':
